@@ -90,3 +90,36 @@ ax2.set_ylabel('Proportion of Deaths')
 ax2.legend(['Before Washing', 'After Washing'])
 st.pyplot(fig2)
 
+st.markdown('''
+## 7. More handwashing, fewer deaths?
+<p>Again, the graph shows that handwashing had a huge effect. How much did it reduce the monthly proportion of deaths on average?</p>
+''', unsafe_allow_html=True)
+
+before_proportion = before_washing['proportion_deaths']
+after_proportion = after_washing['proportion_deaths']
+mean_diff = after_proportion.mean() - before_proportion.mean()
+mean_diff
+
+st.markdown('''
+## 8. A Bootstrap analysis of Semmelweis handwashing data
+<p>It reduced the proportion of deaths by around 8 percentage points! From 10% on average to just 2% (which is still a high number by modern standards). </p>
+<p>To get a feeling for the uncertainty around how much handwashing reduces mortalities we could look at a confidence interval (here calculated using the bootstrap method).</p>
+''', unsafe_allow_html=True)
+
+# A bootstrap analysis of the reduction of deaths due to handwashing
+boot_mean_diff = []
+for i in range(3000):
+    boot_before = before_proportion.sample(frac=1, replace=True)
+    boot_after = after_proportion.sample(frac=1, replace=True)
+    boot_mean_diff.append(boot_after.mean() - boot_before.mean())
+
+# Calculating a 95% confidence interval from boot_mean_diff 
+confidence_interval = pd.Series(boot_mean_diff).quantile([0.025, 0.975])
+confidence_interval
+
+st.markdown('''
+## 9. Conclusion
+<p>So handwashing reduced the proportion of deaths by between 6.7 and 10 percentage points, according to a 95% confidence interval. All in all, it would seem that Semmelweis had solid evidence that handwashing was a simple but highly effective procedure that could save many lives.</p>
+<p>The tragedy is that, despite the evidence, Semmelweis' theory — that childbed fever was caused by some "substance" (what we today know as <em>bacteria</em>) from autopsy room corpses — was ridiculed by contemporary scientists. The medical community largely rejected his discovery and in 1849 he was forced to leave the Vienna General Hospital for good.</p>
+<p>One reason for this was that statistics and statistical arguments were uncommon in medical science in the 1800s. Semmelweis only published his data as long tables of raw data, but he didn't show any graphs nor confidence intervals. If he would have had access to the analysis we've just put together he might have been more successful in getting the Viennese doctors to wash their hands.</p>
+''', unsafe_allow_html=True)
